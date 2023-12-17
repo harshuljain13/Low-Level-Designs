@@ -116,9 +116,9 @@ class OrderBook:
         # get the order from the heap.
         print(f'deleting buy order {order.order_id} from the buy_orders')
         is_index_valid = self.buy_orders.delete_order(self.buy_order_price_to_heap_index_map[order_price], order.order_id)
-        if is_index_valid:
+        if not is_index_valid:
             del self.buy_order_price_to_heap_index_map[order_price]
-            print(f'after deleting the buy order with price {order_price}: {self.buy_order_price_to_heap_index_map}')
+            print(f'After deleting the buy order with price {order_price}: {self.buy_order_price_to_heap_index_map}')
 
         # update the volume 
         self.buy_volume_at_price[order.price] -= order.volume
@@ -144,9 +144,9 @@ class OrderBook:
         print(f'deleting sell order {order.order_id} from the sell_orders')
         is_index_valid = self.sell_orders.delete_order(self.sell_order_price_to_heap_index_map[order_price], order.order_id)
 
-        if is_index_valid:
+        if not is_index_valid:
             del self.sell_order_price_to_heap_index_map[order_price]
-            print(f'after deleting the sell order with price {order_price}: {self.sell_order_price_to_heap_index_map}')
+            print(f'After deleting the sell order with price {order_price}: {self.sell_order_price_to_heap_index_map}')
 
         # update the volume 
         self.sell_volume_at_price[order.price] -= order.volume
