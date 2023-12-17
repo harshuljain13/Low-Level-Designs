@@ -37,6 +37,7 @@ class OrderBook:
             print(f'Buy order with {order.order_id, order_price} found in heap index map: {self.buy_order_price_to_heap_index_map}')
             # get the price_node
             heap_index = self.buy_order_price_to_heap_index_map[order_price]
+            print(f'Buy order with exists in heap index map at {heap_index}')
 
             # add the order to specific heap node.
             self.buy_orders.push_order_at_index(order, heap_index)
@@ -63,12 +64,12 @@ class OrderBook:
             self.sell_order_price_to_heap_index_map[order_price] = new_node_index
             print(f'heap index map after storing sell order {order.order_id}: {self.sell_order_price_to_heap_index_map}')
         else:
-            print(f'Sell order with {order.order_id, order_price} found in heap index map: {self.sell_order_price_to_heap_index_map}')
             # get the price_node
-            node_index = self.sell_order_price_to_heap_index_map[order_price]
+            heap_index = self.sell_order_price_to_heap_index_map[order_price]
+            print(f'Sell order with exists in heap index map at {heap_index}')
 
             # add the order to specific heap node.
-            self.sell_orders.push_order_at_index(order, node_index)
+            self.sell_orders.push_order_at_index(order, heap_index)
 
         # update the volume 
         self.sell_volume_at_price[order.price] += order.volume
@@ -92,6 +93,8 @@ class OrderBook:
             print(f'............sell order matched..............')
 
     def place_order(self, order: Order):
+        print(f'\n')
+        print('...............Placing the order.................')
         if order.order_type  == OrderType.BUY:
             print(f'Detected a buy order with id:{order.order_id}, price:{order.price}, volume:{order.volume}')
             self.place_buy_order(order)
@@ -104,15 +107,15 @@ class OrderBook:
         delete the buy order from the order book
         '''
         order_price = order.price
-        print(f'deleting buy order with price:{order_price}')
+        print(f'........Deleting buy order........')
 
         if order_price not in self.buy_order_price_to_heap_index_map:
             print(f'buy order with price {order_price} does not exist in heap {self.buy_order_price_to_heap_index_map}')
             return
 
         # get the order from the heap.
-        print(f'deleting buy order with price:{order_price} from the buy_orders')
-        is_index_valid = self.buy_orders.delete_order(self.buy_order_price_to_heap_index_map[order_price], order)
+        print(f'deleting buy order {order.order_id} from the buy_orders')
+        is_index_valid = self.buy_orders.delete_order(self.buy_order_price_to_heap_index_map[order_price], order.order_id)
         if is_index_valid:
             del self.buy_order_price_to_heap_index_map[order_price]
             print(f'after deleting the buy order with price {order_price}: {self.buy_order_price_to_heap_index_map}')
@@ -131,15 +134,16 @@ class OrderBook:
         delete the buy order from the order book
         '''
         order_price = order.price
-        print(f'deleting sell order with price:{order_price}')
+        print(f'........Deleting sell order........')
 
         if order_price not in self.sell_order_price_to_heap_index_map:
             print(f'sell order with price {order_price} does not exist in heap {self.sell_order_price_to_heap_index_map}')
             return
 
         # get the order from the heap.
-        print(f'deleting sell order with price:{order_price} from the sell_orders')
-        is_index_valid = self.sell_orders.delete_order(self.sell_order_price_to_heap_index_map[order_price], order)
+        print(f'deleting sell order {order.order_id} from the sell_orders')
+        is_index_valid = self.sell_orders.delete_order(self.sell_order_price_to_heap_index_map[order_price], order.order_id)
+
         if is_index_valid:
             del self.sell_order_price_to_heap_index_map[order_price]
             print(f'after deleting the sell order with price {order_price}: {self.sell_order_price_to_heap_index_map}')

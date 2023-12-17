@@ -19,6 +19,8 @@ class DoublyLinkedList:
         self.order_id_to_dll_node_map = dict()
 
     def add_order(self, order: Order):
+
+        print(f'...........Adding order to to DLL.......')
         node = DoublyLinkedListNode(order)
         
         node.prev = self.tail.prev
@@ -32,17 +34,22 @@ class DoublyLinkedList:
         print(f'DLL current size after adding order : {self.current_size}')
 
     def delete_order(self, order_id):
+        print(f'...........Deleting order from DLL.......')
         node = self.order_id_to_dll_node_map[order_id]
 
         node.prev.next = node.next
         node.next.prev = node.prev
-        del self.order_id_to_dll_node_map[node]
+        del self.order_id_to_dll_node_map[order_id]
         self.current_size -= 1
+        print(f'DLL state map after deleting order : {self.order_id_to_dll_node_map}')
+        print(f'DLL current size after deleting order : {self.current_size}')
 
     def peek(self):
+
         return self.head.next
 
     def size(self):
+        print(f'DLL current size : {self.current_size}')
         return self.current_size
 
 
@@ -105,29 +112,36 @@ class SellOrdersMinHeap:
         '''
         add order to the specific dll in the heap.
         '''
+        print('Adding order in the heap node')
         dll = self.heap[index]
-        dll.add_node(order)
+        dll.add_order(order)
 
-    def delete_node(self, dll_index: int):
-        self.heap[dll_index] = self.heap[self.current_size - 1]
+    def delete_node(self, index: int):
+        self.heap[index] = self.heap[self.current_size - 1]
         self.heap.pop()
         self.current_size -= 1
 
-        self.top_bottom_min_heapify(dll_index)
+        self.top_bottom_min_heapify(index)
 
 
-    def delete_order(self, dll_index: int, order_id) -> bool:
-        dll = self.heap[dll_index]
-        dll.delete_node(order_id)
+    def delete_order(self, index: int, order_id) -> bool:
+        print(f'Deleting the order {order_id} at index {index}')
+        dll = self.heap[index]
+        dll.delete_order(order_id)
 
         if dll.size() == 0:
             # remove the dll from the heap
-            self.delete_node(dll_index)
+            self.delete_node(index)
             return False
         return True
 
     def peek(self):
-        return self.heap[0] if self.current_size > 0 else None
+        print(f'sell heap state while peeking: {self.heap}, {self.current_size}')
+        if self.current_size == 0:
+            return None
+        
+        dll = self.heap[0]
+        return dll.peek().value
 
     def size(self):
         return self.current_size
@@ -190,22 +204,25 @@ class BuyOrdersMaxHeap:
         return order_dll_index
 
     def push_order_at_index(self, order: Order, index: int):
+        print('Adding order in the heap node')
         dll = self.heap[index]
-        dll.add_node(order)
+        dll.add_order(order)
 
-    def delete_node(self, dll_index: int):  
-        self.heap[dll_index] = self.heap[self.current_size - 1]
+    def delete_node(self, index: int):  
+        self.heap[index] = self.heap[self.current_size - 1]
         self.heap.pop()
         self.current_size -= 1
 
-        self.top_bottom_max_heapify(dll_index)
+        self.top_bottom_max_heapify(index)
 
-    def delete_order(self, dll_index: int, orderId) -> bool:
-        dll = self.heap[dll_index]
-        dll.delete_node(orderId)
+    def delete_order(self, index: int, order_id) -> bool:
+        print(f'Deleting the order {order_id} at index {index}')
+        dll = self.heap[index]
+        dll.delete_order(order_id)
+
         if dll.size() == 0:
             # remove the dll from the heap
-            self.delete_node(dll_index)
+            self.delete_node(index)
             return False
         return True
 
