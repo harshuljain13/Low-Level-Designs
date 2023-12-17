@@ -12,7 +12,7 @@ Low Level Designs for the interviews.
 - [ ] Locker Management
 - [ ] Ride share
 - [ ] Stock Exchange
-- [ ] Order Booking
+- [X] Limit Order Booking
 
 ### Games
 
