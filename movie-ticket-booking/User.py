@@ -42,7 +42,7 @@ class User(ABC):
        - Validation methods ensure data integrity
     
     3. INHERITANCE: Base class for specialized user types
-       - Common functionality (authentication, status management) defined once
+       - Common functionality (role management) defined once
        - Subclasses inherit common behavior and add specialized features
 
     4. OPEN/CLOSED PRINCIPLE: Extends without modifying
@@ -459,3 +459,22 @@ class UserFactory:
         
         if not password or len(password) < 6:
             raise ValueError("Password must be at least 6 characters long")
+        
+
+if __name__ == "__main__":
+    print("...Testing UserFactory...")
+    user = UserFactory.create_user(UserRole.CUSTOMER, 
+                                   "1", "John Doe", 
+                                   "john.doe@example.com", 
+                                   "1234567890", "password")
+    admin = UserFactory.create_user(UserRole.ADMIN, 
+                                   "1", "John Doe", 
+                                   "john.doe@example.com", 
+                                   "1234567890", "password")
+    theater_manager = UserFactory.create_user(UserRole.THEATER_MANAGER, 
+                                   "1", "John Doe", 
+                                   "john.doe@example.com", 
+                                   "1234567890", "password")
+    print(user)
+    print(admin)
+    print(theater_manager)

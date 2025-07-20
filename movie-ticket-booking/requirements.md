@@ -33,12 +33,11 @@ Design a movie ticket booking system similar to BookMyShow or Fandango. The syst
 
 ### Entities
 - **Users** - Customer, Admin, Theater Manager
+- **Seats**: Different categories (Premium, Regular, Recliner) with dynamic pricing
 - **Movies**: Title, genre, duration, rating, language, release date, description
 - **Theaters**: Name, location, contact info, screens
 - **Screens**: Multiple screens per theater with different capacities and types (IMAX, 3D, Regular)
-- **Seats**: Different categories (Premium, Regular, Recliner) with dynamic pricing
 - **Shows**: Movies scheduled at specific times on specific screens
-
 
 ## Key Design Considerations for Interview
 

@@ -3,7 +3,7 @@ from enum import Enum
 from datetime import datetime
 
 # Import pricing strategies from separate module
-from SeatPricingStrategy import PricingStrategy, SeatType
+from SeatPricingStrategy import PricingStrategy, SeatType, PricingStrategyFactory
 
 class SeatStatus(Enum):
     """
@@ -181,7 +181,7 @@ class Seat(ABC):
         """
         pass
 
-    def calculate_price(self, pricing_strategy: PricingStrategy, **context) -> float:
+    def calculate_price(self, pricing_strategy: PricingStrategy) -> float:
         """
         Calculate seat price using provided pricing strategy.
         
@@ -204,11 +204,9 @@ class Seat(ABC):
         Example Usage:
             from SeatPricingStrategy import WeekdayPricingStrategy, WeekendPricingStrategy
             
-            weekday_price = seat.calculate_price(WeekdayPricingStrategy())
-            weekend_price = seat.calculate_price(WeekendPricingStrategy()) 
             holiday_price = seat.calculate_price(HolidayPricingStrategy())
         """
-        return pricing_strategy.calculate_price(self._base_price, self.get_seat_type(), **context)
+        return pricing_strategy.calculate_price(self._base_price)
     
     def __str__(self) -> str:
         """
@@ -372,3 +370,33 @@ class SeatFactory:
             seat = SeatFactory.create_seat(seat_type, seat_id, seat_number, base_price)
             seats.append(seat)
         return seats
+    
+
+if __name__ == "__main__":
+    # Create a premium seat for testing
+    premium_seat = SeatFactory.create_seat(SeatType.PREMIUM, "TEST001", "S1", base_price=100.0)
+    
+    print(f"Testing with: {premium_seat}")
+    print(f"Base price: ₹{premium_seat.base_price}")
+    
+    default_pricing_strategy = PricingStrategyFactory.create_default_strategy()
+    print(f"Default pricing strategy: {default_pricing_strategy}")
+    print(f"Default seat price: {premium_seat.calculate_price(default_pricing_strategy)}")
+
+    holiday_pricing_strategy = PricingStrategyFactory.create_holiday_strategy(holiday_surcharge=0.5)
+    print(f"Holiday pricing strategy: {holiday_pricing_strategy}")
+    print(f"Holiday seat price: {premium_seat.calculate_price(holiday_pricing_strategy)}")
+    
+    student_discount_pricing_strategy = PricingStrategyFactory.create_student_discount_strategy(discount_rate=0.2)
+    print(f"Student discount pricing strategy: {student_discount_pricing_strategy}")
+    print(f"Student discount seat price: {premium_seat.calculate_price(student_discount_pricing_strategy)}")
+
+    composite_pricing_strategy = PricingStrategyFactory.create_composite_strategy(
+        [default_pricing_strategy, holiday_pricing_strategy, student_discount_pricing_strategy], 
+        combination_method="sequential")
+    print(f"Composite pricing strategy: {composite_pricing_strategy}")
+    print(f"Composite seat price: {premium_seat.calculate_price(composite_pricing_strategy)}")
+
+
+    
+    
