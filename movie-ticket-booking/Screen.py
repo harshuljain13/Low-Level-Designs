@@ -6,12 +6,34 @@ from SeatLayout import SeatLayout
 
 
 class ScreenType(Enum):
+    """
+    Enum for screen types.
+    
+    OOP Principle: Encapsulation
+    - Encapsulates screen type constants in a type-safe way
+    - Prevents invalid screen type values
+    """
     IMAX = "IMAX"
     THREE_D = "3D"
     REGULAR = "Regular"
 
 
 class Screen(ABC):
+    """
+    Abstract base class for all screens.
+    
+    Design Pattern: ABSTRACTION (ABC)
+    OOP Principles Demonstrated:
+    1. ABSTRACTION: Defines interface for all screens
+    2. ENCAPSULATION: Encapsulates screen properties
+    3. OPEN/CLOSED: Allows extension for new screen types
+    4. SINGLE RESPONSIBILITY: Handles screen-level logic only
+    
+    Responsibilities:
+    - Holds screen metadata (id, name, type, capacity)
+    - Manages seat layout
+    - Defines abstract method for seat layout preparation
+    """
     def __init__(self, screen_id: str, screen_name: str, screen_type: str, screen_capacity: int, 
                  num_rows: int, seats_per_row: List[int]):
         self.screen_id = screen_id
@@ -48,6 +70,16 @@ class Screen(ABC):
 
 
 class IMAXScreen(Screen):
+    """
+    Concrete class for IMAX screens.
+    
+    OOP Principle: INHERITANCE
+    - Inherits from Screen
+    - Implements seat layout logic for IMAX
+    
+    Responsibilities:
+    - Prepares seat layout with premium and regular seats
+    """
     def __init__(self, screen_id: str, screen_name: str, screen_capacity: int, 
                  num_rows: int, seats_per_row: List[int]):
         super().__init__(screen_id, screen_name, 
@@ -66,6 +98,16 @@ class IMAXScreen(Screen):
                 self.seat_layout.add_seat(RegularSeat(f"R{row}C{col}", 100), row, col)
 
 class ThreeD(Screen):
+    """
+    Concrete class for 3D screens.
+    
+    OOP Principle: INHERITANCE
+    - Inherits from Screen
+    - Implements seat layout logic for 3D screens
+    
+    Responsibilities:
+    - Prepares seat layout with premium and recliner seats
+    """
     def __init__(self, screen_id: str, screen_name: str, screen_capacity: int, 
                  num_rows: int, seats_per_row: List[int]):
         super().__init__(screen_id, screen_name, 
