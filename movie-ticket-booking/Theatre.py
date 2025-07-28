@@ -121,12 +121,12 @@ class Theatre:
         return None
     
     # Internal methods for TheatreManager use only
-    def _add_show(self, show: Show) -> None:
+    def add_show(self, show: Show) -> None:
         """Internal method to add a show (used by TheatreManager)."""
         if show not in self._shows:
             self._shows.append(show)
     
-    def _remove_show(self, show: Show) -> None:
+    def remove_show(self, show: Show) -> None:
         """Internal method to remove a show (used by TheatreManager)."""
         if show in self._shows:
             self._shows.remove(show)
