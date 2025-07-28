@@ -58,6 +58,10 @@ class SeatLayout:
             raise ValueError("Invalid row or column")
         return self._seats[row][col]
 
+    def __str__(self):
+        return f"SeatLayout(num_rows={self._num_rows}, seats_per_row={self._seats_per_row})"
+
+
 if __name__ == "__main__":
     # create a seat layout
     seat_layout = SeatLayout(num_rows=10, seats_per_row=[10, 10, 10, 10, 10, 10, 5, 5, 5, 5])
@@ -72,3 +76,5 @@ if __name__ == "__main__":
     print("Seat at row 2, col 2: ", seat_1)
     seat_2 = seat_layout.get_seat(row=1, col=1)
     print("Seat at row 1, col 1: ", seat_2)
+
+    print("Seat layout: ", seat_layout.seats)

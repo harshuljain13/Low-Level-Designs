@@ -225,7 +225,8 @@ class Seat(ABC):
         OOP Principle: Polymorphism
         - Uses class name dynamically
         """
-        return f"{self.__class__.__name__}(id={self._seat_id}, number={self._seat_number})"
+        return f"{self.__class__.__name__}(id={self._seat_id}, \
+            number={self._seat_number})"
 
 
 class RegularSeat(Seat):
@@ -273,6 +274,7 @@ class PremiumSeat(Seat):
     def get_seat_type(self) -> SeatType:
         """Return premium seat type."""
         return SeatType.PREMIUM
+
 
 class ReclinerSeat(Seat):
     """
@@ -374,7 +376,8 @@ class SeatFactory:
 
 if __name__ == "__main__":
     # Create a premium seat for testing
-    premium_seat = SeatFactory.create_seat(SeatType.PREMIUM, "TEST001", "S1", base_price=100.0)
+    premium_seat = SeatFactory.create_seat(SeatType.PREMIUM, "TEST001", "S1", 
+        base_price=100.0)
     
     print(f"Testing with: {premium_seat}")
     print(f"Base price: ₹{premium_seat.base_price}")
@@ -396,7 +399,3 @@ if __name__ == "__main__":
         combination_method="sequential")
     print(f"Composite pricing strategy: {composite_pricing_strategy}")
     print(f"Composite seat price: {premium_seat.calculate_price(composite_pricing_strategy)}")
-
-
-    
-    
