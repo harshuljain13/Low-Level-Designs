@@ -91,7 +91,8 @@ class TheatreManager:
             return False
         
         # Check if screen has active shows
-        active_shows = [s for s in theatre.shows if s.screen.screen_id == screen_id and 
+        active_shows = [s for s in theatre.shows if 
+            s.screen.screen_id == screen_id and 
                         s.status == ShowStatus.SCHEDULED]
         if active_shows:
             return False  # Cannot remove screen with active shows
@@ -105,10 +106,6 @@ class TheatreManager:
         theatre = self.get_theatre(theatre_id)
         print("Getting the Theatre with id: ", theatre_id, " : ", theatre)
         if not theatre or not show:
-            return False
-        
-        if self._show_exists(theatre_id, show.show_id):
-            print("Show already exists: ", show.show_id)
             return False
         
         theatre.add_show(show)
@@ -130,7 +127,8 @@ class TheatreManager:
     def get_available_shows(self, theatre_id: Optional[str] = None) -> List[Show]:
         """Get available shows."""
         shows = []
-        theatres = [self.get_theatre(theatre_id)] if theatre_id else self._theatres.values()
+        theatres = [self.get_theatre(theatre_id)] if theatre_id else
+                    self._theatres.values()
         
         for theatre in theatres:
             if not theatre:
@@ -141,51 +139,22 @@ class TheatreManager:
         return shows
     
     # Show Status Management (delegated to ShowManager - demonstrates abstraction)
-    def start_show(self, show_id: str) -> bool:
+    def start_show(self, theatre_id: str, show_id: str) -> bool:
         """Start a show."""
-        show = self.get_show(show_id)
+        show = self.get_show(theatre_id, show_id)
         if not show or not self._show_manager.can_start_show(show):
             return False
         show.set_status(ShowStatus.RUNNING)
         return True
     
-    def cancel_show(self, show_id: str) -> bool:
+    def cancel_show(self, theatre_id: str, show_id: str) -> bool:
         """Cancel a show."""
-        show = self.get_show(show_id)
+        show = self.get_show(theatre_id, show_id)
         if not show or not self._show_manager.can_cancel_show(show):
             return False
         show.set_status(ShowStatus.CANCELLED)
         return True
-    
-    # Seat Management (delegated to ShowManager - demonstrates abstraction)
-    def book_seat(self, show_id: str, seat_id: str) -> bool:
-        """Book a seat for a show."""
-        show = self.get_show(show_id)
-        return self._show_manager.book_seat(show, seat_id) if show else False
-    
-    def get_available_seats(self, show_id: str) -> List[str]:
-        """Get available seats for a show."""
-        show = self.get_show(show_id)
-        return self._show_manager.get_available_seats(show) if show else []
-    
-    def block_seat(self, show_id: str, seat_id: str) -> bool:
-        """Block a seat temporarily."""
-        show = self.get_show(show_id)
-        return self._show_manager.block_seat(show, seat_id) if show else False
-    
-    def set_show_pricing_strategy(self, show_id: str, pricing_strategy: PricingStrategy) -> bool:
-        """Set pricing strategy for a show."""
-        show = self.get_show(show_id)
-        if not show:
-            return False
-        show.set_pricing_strategy(pricing_strategy)
-        return True
-    
-    # Private helper methods
-    def _show_exists(self, theatre_id: str, show_id: str) -> bool:
-        """Check if a show exists."""
-        return self.get_show(theatre_id, show_id) is not None
-    
+
 
 if __name__ == "__main__":
     theatre_manager = TheatreManager()
@@ -268,7 +237,7 @@ if __name__ == "__main__":
         show_time=show_time_1,
         show_duration=152,
         pricing_strategy=PricingStrategyFactory.create_holiday_strategy(
-            holiday_surcharge=1.2)
+            holiday_surcharge=0.2)
     )
     print("Created show 1: ", show1)
     print("--------------------------------")

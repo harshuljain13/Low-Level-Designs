@@ -206,6 +206,7 @@ class Seat(ABC):
             
             holiday_price = seat.calculate_price(HolidayPricingStrategy())
         """
+        print("Calculating price for seat: ", self._seat_id, " with base price: ", self._base_price)
         return pricing_strategy.calculate_price(self._base_price)
     
     def __str__(self) -> str:
