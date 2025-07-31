@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from Theatre import Theatre, TheatreStatus
-from Screen import Screen,IMAXScreen, ThreeD
+from Screen import Screen, IMAXScreen, ThreeD
 from Show import Show, ShowStatus
 from ShowManager import ShowManager
 from Movie import Movie, MovieLanguage, MovieGenre
@@ -9,21 +9,23 @@ from SeatPricingStrategy import PricingStrategy, PricingStrategyFactory
 
 
 class TheatreManager:
-    '''
+    """
     TheatreManager class - Minimalistic theatre management with composition.
-    
+
     Design Pattern: COMPOSITION + MANAGER PATTERN
     OOP Principles:
     - Single Responsibility: Manages theatre operations only
     - Encapsulation: Encapsulates theatre management logic
     - Composition: Contains ShowManager for show operations (demonstrates composition)
     - Abstraction: Delegates show-specific logic to ShowManager (demonstrates abstraction)
-    '''
-    
+    """
+
     def __init__(self):
         self._theatres: Dict[str, Theatre] = {}
-        self._show_manager = ShowManager()  # Composition: TheatreManager uses ShowManager
-    
+        self._show_manager = (
+            ShowManager()
+        )  # Composition: TheatreManager uses ShowManager
+
     # Core Theatre Operations
     def add_theatre(self, theatre: Theatre) -> bool:
         """Add a theatre to the system."""
@@ -31,25 +33,27 @@ class TheatreManager:
             return False
         self._theatres[theatre.theatre_id] = theatre
         return True
-    
+
     def get_theatre(self, theatre_id: str) -> Optional[Theatre]:
         """Get theatre by ID."""
         return self._theatres.get(theatre_id)
-    
+
     def get_all_theatres(self) -> List[Theatre]:
         """Get all theatres."""
         return list(self._theatres.values())
-    
+
     def get_theatres_by_location(self, location: str) -> List[Theatre]:
         """Get theatres by location."""
-        return [t for t in self._theatres.values() 
-                if t.theatre_location.lower() == location.lower()]
-    
+        return [
+            t
+            for t in self._theatres.values()
+            if t.theatre_location.lower() == location.lower()
+        ]
+
     def get_active_theatres(self) -> List[Theatre]:
         """Get active theatres."""
-        return [t for t in self._theatres.values() 
-                if t.status == TheatreStatus.ACTIVE]
-    
+        return [t for t in self._theatres.values() if t.status == TheatreStatus.ACTIVE]
+
     # Theatre Status Management
     def set_theatre_status(self, theatre_id: str, status: TheatreStatus) -> bool:
         """Set theatre status."""
@@ -58,48 +62,50 @@ class TheatreManager:
             return False
         theatre.set_status(status)
         return True
-    
+
     # Screen Management
     def add_screen(self, theatre_id: str, screen: Screen) -> bool:
         """Add a screen to a theatre."""
         theatre = self.get_theatre(theatre_id)
         if not theatre or not screen:
             return False
-        
+
         if theatre.get_screen_by_id(screen.screen_id):
             return False
-        
+
         theatre.add_screen(screen)
         return True
-    
+
     def get_screen(self, theatre_id: str, screen_id: str) -> Optional[Screen]:
         """Get screen by ID."""
         theatre = self.get_theatre(theatre_id)
         if not theatre:
             return None
-        
+
         return theatre.get_screen_by_id(screen_id)
-    
+
     def remove_screen(self, theatre_id: str, screen_id: str) -> bool:
         """Remove a screen from a theatre."""
         theatre = self.get_theatre(theatre_id)
         if not theatre:
             return False
-        
+
         screen = theatre.get_screen_by_id(screen_id)
         if not screen:
             return False
-        
+
         # Check if screen has active shows
-        active_shows = [s for s in theatre.shows if 
-            s.screen.screen_id == screen_id and 
-                        s.status == ShowStatus.SCHEDULED]
+        active_shows = [
+            s
+            for s in theatre.shows
+            if s.screen.screen_id == screen_id and s.status == ShowStatus.SCHEDULED
+        ]
         if active_shows:
             return False  # Cannot remove screen with active shows
-        
+
         theatre.remove_screen(screen)
         return True
-    
+
     # Show Management
     def add_show(self, theatre_id: str, show: Show) -> bool:
         """Add a show to a theatre."""
@@ -107,29 +113,30 @@ class TheatreManager:
         print("Getting the Theatre with id: ", theatre_id, " : ", theatre)
         if not theatre or not show:
             return False
-        
+
         theatre.add_show(show)
         return True
-    
+
     def get_show(self, theatre_id: str, show_id: str) -> Optional[Show]:
         """Get show by ID."""
         theatre = self.get_theatre(theatre_id)
         print("Getting the Theatre with id: ", theatre_id, " : ", theatre)
         show = theatre.get_show_by_id(show_id)
         return show
-    
+
     def get_shows_by_theatre(self, theatre_id: str) -> List[Show]:
         """Get all shows in a theatre."""
         theatre = self.get_theatre(theatre_id)
         print("Theatre: ", theatre.shows)
         return theatre.shows if theatre else []
-    
+
     def get_available_shows(self, theatre_id: Optional[str] = None) -> List[Show]:
         """Get available shows."""
         shows = []
-        theatres = [self.get_theatre(theatre_id)] if theatre_id else
-                    self._theatres.values()
-        
+        theatres = [
+            self.get_theatre(theatre_id) if theatre_id else self._theatres.values()
+        ]
+
         for theatre in theatres:
             if not theatre:
                 continue
@@ -137,7 +144,7 @@ class TheatreManager:
                 if show.status == ShowStatus.SCHEDULED:
                     shows.append(show)
         return shows
-    
+
     # Show Status Management (delegated to ShowManager - demonstrates abstraction)
     def start_show(self, theatre_id: str, show_id: str) -> bool:
         """Start a show."""
@@ -146,7 +153,7 @@ class TheatreManager:
             return False
         show.set_status(ShowStatus.RUNNING)
         return True
-    
+
     def cancel_show(self, theatre_id: str, show_id: str) -> bool:
         """Cancel a show."""
         show = self.get_show(theatre_id, show_id)
@@ -164,13 +171,17 @@ if __name__ == "__main__":
     # Create theatres
     print("--------------------------------")
     print("Creating theatre 1: ")
-    theatre1 = Theatre("1", "Theatre 1", "Location 1", "Address 1", "Contact 1", "Email 1")
+    theatre1 = Theatre(
+        "1", "Theatre 1", "Location 1", "Address 1", "Contact 1", "Email 1"
+    )
     print("--------------------------------")
     print("Adding theatre 1: ", theatre1)
     theatre_manager.add_theatre(theatre1)
     print("--------------------------------")
     print("Creating theatre 2: ")
-    theatre2 = Theatre("2", "Theatre 2", "Location 2", "Address 2", "Contact 2", "Email 2")
+    theatre2 = Theatre(
+        "2", "Theatre 2", "Location 2", "Address 2", "Contact 2", "Email 2"
+    )
     print("--------------------------------")
     print("Adding theatre 2: ", theatre2)
     theatre_manager.add_theatre(theatre2)
@@ -181,8 +192,10 @@ if __name__ == "__main__":
     print("--------------------------------")
     print("Fetching all theatres: ", theatre_manager.get_all_theatres())
     print("--------------------------------")
-    print("Fetching theatres by location: ", theatre_manager.get_theatres_by_location(
-        "Location 1"))
+    print(
+        "Fetching theatres by location: ",
+        theatre_manager.get_theatres_by_location("Location 1"),
+    )
     print("--------------------------------")
     print("Fetching active theatres: ", theatre_manager.get_active_theatres())
     print("--------------------------------")
@@ -191,7 +204,7 @@ if __name__ == "__main__":
     print("--------------------------------")
     screen1 = IMAXScreen("1", "Screen 1", 100, 2, [10, 10])
     print("Created screen 1: ", screen1)
-    
+
     print("--------------------------------")
     screen2 = ThreeD("2", "Screen 2", 100, 2, [10, 10])
     print("Created screen 2: ", screen2)
@@ -211,12 +224,30 @@ if __name__ == "__main__":
     print("--------------------------------")
 
     # Create movies
-    movie1 = Movie("1", "Movie 1", 120, MovieLanguage.ENGLISH, 
-                MovieGenre.ACTION, 9.0, "2021-01-01", "Director 1", 
-                    "Cast 1", "Trailer 1")
-    movie2 = Movie("2", "Movie 2", 120, MovieLanguage.ENGLISH, 
-                MovieGenre.ACTION, 9.0, "2021-01-01", "Director 2", 
-                "Cast 2", "Trailer 2")
+    movie1 = Movie(
+        "1",
+        "Movie 1",
+        120,
+        MovieLanguage.ENGLISH,
+        MovieGenre.ACTION,
+        9.0,
+        "2021-01-01",
+        "Director 1",
+        "Cast 1",
+        "Trailer 1",
+    )
+    movie2 = Movie(
+        "2",
+        "Movie 2",
+        120,
+        MovieLanguage.ENGLISH,
+        MovieGenre.ACTION,
+        9.0,
+        "2021-01-01",
+        "Director 2",
+        "Cast 2",
+        "Trailer 2",
+    )
 
     print("--------------------------------")
     print("Fetching movie 1: ", movie1)
@@ -237,7 +268,8 @@ if __name__ == "__main__":
         show_time=show_time_1,
         show_duration=152,
         pricing_strategy=PricingStrategyFactory.create_holiday_strategy(
-            holiday_surcharge=0.2)
+            holiday_surcharge=0.2
+        ),
     )
     print("Created show 1: ", show1)
     print("--------------------------------")
@@ -253,7 +285,8 @@ if __name__ == "__main__":
         show_time=show_time_2,
         show_duration=152,
         pricing_strategy=PricingStrategyFactory.create_student_discount_strategy(
-            discount_rate=0.2)
+            discount_rate=0.2
+        ),
     )
     print("Created show 2: ", show2)
     print("--------------------------------")
