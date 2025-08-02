@@ -5,12 +5,12 @@ and their operations.
 import copy
 from typing import List, Dict, Optional
 from datetime import datetime
-from .Theatre import Theatre, TheatreStatus
-from .Screen import Screen, IMAXScreen, ThreeD
-from .Show import Show, ShowStatus
-from .ShowManager import ShowManager
-from .Movie import Movie, MovieLanguage, MovieGenre
-from .SeatPricingStrategy import PricingStrategyFactory
+from Theatre import Theatre, TheatreStatus
+from Screen import Screen, IMAXScreen, ThreeD
+from Show import Show, ShowStatus
+from ShowManager import ShowManager
+from Movie import Movie, MovieLanguage, MovieGenre
+from SeatPricingStrategy import PricingStrategyFactory
 
 
 class TheatreManager:
