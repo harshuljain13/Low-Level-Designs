@@ -103,17 +103,27 @@ class BookingManager:
     def block_seat(self, show: Show, seat_id: str) -> bool:
         """Block a seat temporarily for booking process."""
         if not self.is_seat_available(show, seat_id):
+            print(f"Seat {seat_id} is not available")
             return False
 
         if show.show_id not in self._blocked_seats:
             self._blocked_seats[show.show_id] = {}
 
         self._blocked_seats[show.show_id][seat_id] = datetime.now()
+        print(f"Blocked seat {seat_id}: Success")
         return True
 
     def unblock_seat(self, show: Show, seat_id: str) -> bool:
         """Unblock a seat."""
         return self._unblock_seat(show.show_id, seat_id)
+
+    def unblock_multiple_seats(self, show: Show, seat_ids: List[str]) -> Dict[str, bool]:
+        """Unblock multiple seats and return results for each seat."""
+        results = {}
+        for seat_id in seat_ids:
+            results[seat_id] = self.unblock_seat(show, seat_id)
+        print(f"Unblocked seats: {results}")
+        return results
 
     def block_multiple_seats(self, show: Show, seat_ids: List[str]) -> Dict[str, bool]:
         """Block multiple seats and return results for each seat."""
@@ -121,7 +131,7 @@ class BookingManager:
 
         for seat_id in seat_ids:
             results[seat_id] = self.block_seat(show, seat_id)
-
+        print(f"Blocked seats: {results}")
         return results
 
     def get_blocked_seats(self, show: Show) -> List[str]:
@@ -158,18 +168,6 @@ class BookingManager:
             ),
             "status": show.status.value,
         }
-
-    def get_show_revenue(self, show: Show) -> float:
-        """Calculate total revenue for a show using pricing strategy."""
-        total_revenue = 0.0
-
-        for row in range(show.seat_layout.num_rows):
-            for col in range(show.seat_layout.seats_per_row[row]):
-                seat = show.seat_layout.get_seat(row, col)
-                if seat and seat.status == SeatStatus.BOOKED:
-                    total_revenue += show.calculate_seat_price(seat.seat_id)
-
-        return total_revenue
 
     # Cleanup expired blocks
     def cleanup_expired_blocks(self) -> int:
@@ -247,8 +245,10 @@ class BookingManager:
             # Remove empty show entries
             if not self._blocked_seats[show_id]:
                 del self._blocked_seats[show_id]
-
+                
+            print(f"Unblocked seat {seat_id}: Success")
             return True
+        print(f"Unblocked seat {seat_id}: Failed")
         return False
 
 
@@ -275,6 +275,8 @@ if __name__ == "__main__":
     )
     
     # Create a show
+    print("--------------------------------")
+    print("Creating a show")
     show_time = datetime.now().replace(hour=14, minute=30, second=0, microsecond=0)
     show = Show(
         "SH001", movie, screen, show_time, 120,
@@ -282,22 +284,90 @@ if __name__ == "__main__":
     )
     
     # Test booking manager
+    print("--------------------------------")
+    print("Creating a booking manager")
     booking_manager = BookingManager()
     
     # Test seat availability
+    print("--------------------------------")
+    print("Testing seat availability")
     available_seats = booking_manager.get_available_seats(show)
     print(f"Available seats: {len(available_seats)}")
     
     # Test seat booking
+    print("--------------------------------")
+    print("Testing seat booking")
     if available_seats:
         seat_id = available_seats[0]
         success = booking_manager.book_seat(show, seat_id)
-        print(f"Booking seat {seat_id}: {success}")
+        if success:
+            print(f"Booking seat {seat_id}: Success")
+        else:
+            print(f"Failed to book seat {seat_id}")
     
     # Test show statistics
+    print("--------------------------------")
+    print("Testing show statistics")
     stats = booking_manager.get_show_statistics(show)
     print(f"Show statistics: {stats}")
+
+    # Test seat cancellation
+    print("--------------------------------")
+    print("Testing seat cancellation")
+    success = booking_manager.cancel_seat_booking(show, seat_id)
+    if success:
+        print(f"Cancelled seat {seat_id}: Success")
+    else:
+        print(f"Failed to cancel seat {seat_id}")
+
+    # Test show statistics
+    print("--------------------------------")
+    print("Testing show statistics")
+    stats = booking_manager.get_show_statistics(show)
+    print(f"Show statistics: {stats}")
+
+    # Test seat blocking
+    print("--------------------------------")
+    print("Testing seat blocking")
+    success = booking_manager.block_seat(show, seat_id)
+
+    # Test show statistics
+    print("--------------------------------")
+    print("Testing show statistics")
+    stats = booking_manager.get_show_statistics(show)
+    print(f"Show statistics: {stats}")
+
+    # Test seat unblocking
+    print("--------------------------------")
+    print("Testing seat unblocking")
+    success = booking_manager.unblock_seat(show, seat_id)
     
-    # Test show revenue
-    revenue = booking_manager.get_show_revenue(show)
-    print(f"Show revenue: ${revenue:.2f}")
+
+    # Test show statistics
+    print("--------------------------------")
+    print("Testing show statistics")
+    stats = booking_manager.get_show_statistics(show)
+    print(f"Show statistics: {stats}")
+
+    # Blocking multiple seats
+    print("--------------------------------")
+    print("Testing blocking multiple seats")
+    seat_ids = ["R0C0", "R0C1", "R0C2"]
+    success = booking_manager.block_multiple_seats(show, seat_ids)
+
+    # Test show statistics
+    print("--------------------------------")
+    print("Testing show statistics")
+    stats = booking_manager.get_show_statistics(show)
+    print(f"Show statistics: {stats}")
+
+    # Unblocking multiple seats
+    print("--------------------------------")
+    print("Testing unblocking multiple seats")
+    success = booking_manager.unblock_multiple_seats(show, seat_ids)
+
+    # Test show statistics
+    print("--------------------------------")
+    print("Testing show statistics")
+    stats = booking_manager.get_show_statistics(show)
+    print(f"Show statistics: {stats}")

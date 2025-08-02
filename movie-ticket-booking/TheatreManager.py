@@ -5,12 +5,12 @@ and their operations.
 import copy
 from typing import List, Dict, Optional
 from datetime import datetime
-from Theatre import Theatre, TheatreStatus
-from Screen import Screen, IMAXScreen, ThreeD
-from Show import Show, ShowStatus
-from ShowManager import ShowManager
-from Movie import Movie, MovieLanguage, MovieGenre
-from SeatPricingStrategy import PricingStrategyFactory
+from .Theatre import Theatre, TheatreStatus
+from .Screen import Screen, IMAXScreen, ThreeD
+from .Show import Show, ShowStatus
+from .ShowManager import ShowManager
+from .Movie import Movie, MovieLanguage, MovieGenre
+from .SeatPricingStrategy import PricingStrategyFactory
 
 
 class TheatreManager:
@@ -391,5 +391,4 @@ if __name__ == "__main__":
     # Cancel and remove show
     print("--------------------------------")
     print("Cancelling and removing show 2 from theatre 1: ",
-        theatre_manager.cancel_and_remove_show("1", "SH002"))
-        
+          theatre_manager.cancel_and_remove_show("1", "SH002"))
