@@ -1,6 +1,6 @@
 # Movie Ticket Booking System - UML Diagrams
 
-This directory contains comprehensive UML class diagrams for the Movie Ticket Booking System in both Markdown and PNG formats.
+This directory contains comprehensive UML class diagrams for the Movie Ticket Booking System in both Markdown and high-definition PNG formats.
 
 ## 📁 Files Overview
 
@@ -14,15 +14,15 @@ This directory contains comprehensive UML class diagrams for the Movie Ticket Bo
 - **`07_manager_classes.md`** - Service layer manager classes
 - **`08_complete_system.md`** - Complete system integration
 
-### 🖼️ PNG Image Files
-- **`01_movie_system.png`** - Movie system visualization
-- **`02_screen_hierarchy.png`** - Screen hierarchy visualization
-- **`03_seat_hierarchy.png`** - Seat hierarchy visualization
-- **`04_pricing_strategy.png`** - Pricing strategy visualization
-- **`05_user_hierarchy.png`** - User hierarchy visualization
-- **`06_core_business_classes.png`** - Core business classes visualization
-- **`07_manager_classes.png`** - Manager classes visualization
-- **`08_complete_system.png`** - Complete system visualization
+### 🖼️ High-Definition PNG Image Files
+- **`01_movie_system.png`** (218KB) - Movie system visualization
+- **`02_screen_hierarchy.png`** (199KB) - Screen hierarchy visualization
+- **`03_seat_hierarchy.png`** (370KB) - Seat hierarchy visualization
+- **`04_pricing_strategy.png`** (395KB) - Pricing strategy visualization
+- **`05_user_hierarchy.png`** (380KB) - User hierarchy visualization
+- **`06_core_business_classes.png`** (723KB) - Core business classes visualization
+- **`07_manager_classes.png`** (870KB) - Manager classes visualization
+- **`08_complete_system.png`** (1.5MB) - Complete system visualization
 
 ### 🔧 Mermaid Source Files (.mmd)
 - **`01_movie_system.mmd`** - Mermaid source for movie system
@@ -35,33 +35,60 @@ This directory contains comprehensive UML class diagrams for the Movie Ticket Bo
 - **`08_complete_system_simplified.mmd`** - Mermaid source for complete system
 
 ### 🛠️ Utility Files
-- **`generate_images.sh`** - Script to regenerate all PNG images
+- **`generate_images.sh`** - Script to regenerate all PNG images in Ultra HD quality
+- **`generate_images_quality_options.sh`** - Interactive script with multiple quality options
+- **`backup_original_images.sh`** - Script to backup existing images before regeneration
+- **`custom_theme.css`** - Custom CSS theme for enhanced diagram styling
 - **`README.md`** - This documentation file
 
 ## 🎯 How to Use
 
 ### Viewing Diagrams
-1. **PNG Images**: Open any `.png` file to view the diagram
+1. **PNG Images**: Open any `.png` file to view the high-definition diagram
 2. **Markdown Files**: View in GitHub/GitLab to see interactive Mermaid diagrams
 3. **Mermaid Files**: Use with Mermaid-compatible tools for editing
 
-### Regenerating Images
-```bash
-# Make the script executable
-chmod +x generate_images.sh
+### Image Generation Options
 
-# Generate all PNG images
+#### 1. Ultra HD Quality (Default)
+```bash
+# Generate all images in Ultra HD quality (3840x2160, scale 3)
 ./generate_images.sh
 ```
 
-### Individual Image Generation
+#### 2. Interactive Quality Selection
 ```bash
-# Generate a specific diagram
-mmdc -i 01_movie_system.mmd -o 01_movie_system.png
-
-# Generate with custom theme
-mmdc -i 01_movie_system.mmd -o 01_movie_system.png -t dark
+# Choose from different quality levels
+./generate_images_quality_options.sh
 ```
+**Quality Options:**
+- **Standard Quality**: 1920x1080, scale 1 (smaller files)
+- **High Quality**: 2560x1440, scale 2 (balanced)
+- **Ultra HD**: 3840x2160, scale 3 (current default)
+- **Print Quality**: 5120x2880, scale 4 (largest files)
+
+#### 3. Backup Before Regeneration
+```bash
+# Backup existing images before generating new ones
+./backup_original_images.sh
+```
+
+#### 4. Individual Image Generation
+```bash
+# Generate a specific diagram in Ultra HD
+mmdc -i 01_movie_system.mmd -o 01_movie_system.png -b transparent -w 3840 -H 2160 --scale 3 -C custom_theme.css
+
+# Generate with different quality
+mmdc -i 01_movie_system.mmd -o 01_movie_system_hd.png -b transparent -w 2560 -H 1440 --scale 2 -C custom_theme.css
+```
+
+## 🎨 Custom Theme Features
+
+The `custom_theme.css` provides enhanced styling:
+- **Better Typography**: Arial font family with optimized sizing
+- **Color Coding**: Different colors for abstract classes, enums, and factories
+- **Enhanced Contrast**: Better readability with improved color schemes
+- **Professional Appearance**: Clean, modern look suitable for documentation
 
 ## 🏗️ Design Patterns Demonstrated
 
@@ -135,23 +162,32 @@ mmdc -i 01_movie_system.mmd -o 01_movie_system.png -t dark
 - **Mermaid Live Editor**: Copy `.mmd` content for editing
 - **Documentation**: Use PNG files in presentations and documents
 
+### Quality Selection Guide
+- **Web/Email**: Use Standard Quality (smaller files)
+- **Presentations**: Use High Quality (good balance)
+- **Documentation**: Use Ultra HD (current default)
+- **Print/Posters**: Use Print Quality (highest resolution)
+
 ### Customization
 - Edit `.mmd` files to modify diagrams
-- Use `generate_images.sh` to regenerate PNG files
-- Customize themes with Mermaid CLI options
+- Modify `custom_theme.css` for different styling
+- Use quality options script for different use cases
+- Backup existing images before regeneration
 
 ## 🔧 Technical Details
 
 ### Image Generation
 - **Tool**: Mermaid CLI (mmdc)
 - **Format**: PNG with transparent background
-- **Resolution**: High quality for documentation
-- **Size**: Optimized for web and print
+- **Resolution**: Ultra HD (3840x2160) by default
+- **Scale Factor**: 3x for crisp text and lines
+- **Theme**: Custom CSS for enhanced appearance
 
 ### File Organization
 - **Source**: `.mmd` files contain Mermaid syntax
 - **Documentation**: `.md` files contain descriptions
 - **Output**: `.png` files for easy viewing
 - **Scripts**: Shell scripts for automation
+- **Backup**: Automatic backup before regeneration
 
-This directory provides a complete visual representation of the Movie Ticket Booking System architecture, suitable for documentation, presentations, and development reference. 
+This directory provides a complete visual representation of the Movie Ticket Booking System architecture with high-definition images suitable for documentation, presentations, and development reference. 

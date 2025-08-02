@@ -1,4 +1,6 @@
 classDiagram
+    direction LR
+    
     class Movie {
         -_movie_id: str
         -_movie_name: str
@@ -6,20 +8,12 @@ classDiagram
         -_movie_language: MovieLanguage
         -_movie_genre: MovieGenre
         -_movie_rating: float
-        -_movie_release_date: str
-        -_movie_director: str
-        -_movie_cast: str
-        -_movie_trailer_url: str
         +movie_id: str
         +movie_name: str
         +movie_duration: int
         +movie_language: MovieLanguage
         +movie_genre: MovieGenre
         +movie_rating: float
-        +movie_release_date: str
-        +movie_director: str
-        +movie_cast: str
-        +movie_trailer_url: str
         +__str__(): str
     }
     

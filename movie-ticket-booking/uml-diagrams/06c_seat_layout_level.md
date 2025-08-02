@@ -1,0 +1,60 @@
+# Seat Layout Level UML Diagram
+
+## Seat Management
+
+```mermaid
+classDiagram
+    direction LR
+    
+    class SeatLayout {
+        -_num_rows: int
+        -_seats_per_row: List[int]
+        -_seats: List[List[Seat]]
+        +num_rows: int
+        +seats_per_row: List[int]
+        +get_seat(row: int, col: int): Seat
+        +get_seat_by_id(seat_id: str): Seat
+        +get_all_seats(): List[Seat]
+    }
+    
+    class Seat {
+        -_seat_id: str
+        -_row_num: int
+        -_col_num: int
+        -_seat_type: SeatType
+        -_status: SeatStatus
+        -_price: float
+        +seat_id: str
+        +row_num: int
+        +col_num: int
+        +seat_type: SeatType
+        +status: SeatStatus
+        +price: float
+        +is_available(): bool
+        +book(): bool
+        +release(): void
+    }
+    
+    class SeatType {
+        <<enumeration>>
+        REGULAR
+        PREMIUM
+        VIP
+        COUPLE
+    }
+    
+    class SeatStatus {
+        <<enumeration>>
+        AVAILABLE
+        BOOKED
+        BLOCKED
+        MAINTENANCE
+    }
+    
+    SeatLayout *-- Seat : contains
+    Seat *-- SeatType : has
+    Seat *-- SeatStatus : has
+```
+
+## Description
+This diagram shows the SeatLayout-level view focusing on seat management. The SeatLayout contains a 2D grid of Seats, each with a specific type and status. The SeatType and SeatStatus enums define the possible seat categories and states. Simplified to show only essential seat-level operations and relationships. 

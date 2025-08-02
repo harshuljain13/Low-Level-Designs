@@ -1,0 +1,52 @@
+/* Custom theme for high-quality UML diagrams */
+.classDiagram {
+    font-family: 'Arial', sans-serif;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.classDiagram .class {
+    stroke: #333;
+    stroke-width: 2px;
+    fill: #f9f9f9;
+}
+
+.classDiagram .classTitle {
+    font-weight: bold;
+    font-size: 16px;
+    fill: #2c3e50;
+}
+
+.classDiagram .classText {
+    font-size: 12px;
+    fill: #34495e;
+}
+
+.classDiagram .label {
+    font-size: 12px;
+    font-weight: bold;
+    fill: #2c3e50;
+}
+
+.classDiagram .relationshipLabel {
+    font-size: 11px;
+    fill: #7f8c8d;
+}
+
+.classDiagram .enum {
+    stroke: #8e44ad;
+    stroke-width: 2px;
+    fill: #f4f1f8;
+}
+
+.classDiagram .abstract {
+    stroke: #e74c3c;
+    stroke-width: 2px;
+    fill: #fdf2f2;
+}
+
+.classDiagram .factory {
+    stroke: #27ae60;
+    stroke-width: 2px;
+    fill: #f0f8f0;
+} 

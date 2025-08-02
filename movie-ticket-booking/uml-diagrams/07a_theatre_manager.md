@@ -1,0 +1,92 @@
+# Theatre Manager UML Diagram
+
+## Theatre Management Layer
+
+```mermaid
+classDiagram
+    direction LR
+    
+    class TheatreManager {
+        -_theatres: Dict[str, Theatre]
+        -_show_manager: ShowManager
+        +add_theatre(theatre: Theatre): bool
+        +get_theatre(theatre_id: str): Theatre
+        +get_all_theatres(): List[Theatre]
+        +get_theatres_by_location(location: str): List[Theatre]
+        +get_active_theatres(): List[Theatre]
+        +set_theatre_status(theatre_id: str, status: TheatreStatus): bool
+        +add_screen(theatre_id: str, screen: Screen): bool
+        +get_screen(theatre_id: str, screen_id: str): Screen
+        +remove_screen(theatre_id: str, screen_id: str): bool
+        +add_show(theatre_id: str, show: Show): bool
+        +get_show(theatre_id: str, show_id: str): Show
+        +get_shows_by_theatre(theatre_id: str): List[Show]
+        +get_available_shows(theatre_id: str): List[Show]
+        +start_show(theatre_id: str, show_id: str): bool
+        +cancel_show(theatre_id: str, show_id: str): bool
+        +complete_show(theatre_id: str, show_id: str): bool
+        +remove_show(theatre_id: str, show_id: str): bool
+        +cancel_and_remove_show(theatre_id: str, show_id: str): bool
+        +validate_screen_show_relationships(theatre_id: str): Dict
+        +cleanup_orphaned_shows(theatre_id: str): int
+    }
+    
+    class Theatre {
+        -_theatre_id: str
+        -_theatre_name: str
+        -_theatre_location: str
+        -_status: TheatreStatus
+        -_screens: List[Screen]
+        -_shows: List[Show]
+        +theatre_id: str
+        +theatre_name: str
+        +theatre_location: str
+        +status: TheatreStatus
+        +total_screens: int
+        +total_shows: int
+    }
+    
+    class TheatreStatus {
+        <<enumeration>>
+        ACTIVE
+        INACTIVE
+        MAINTENANCE
+        CLOSED
+    }
+    
+    class Screen {
+        -_screen_id: str
+        -_screen_name: str
+        -_capacity: int
+        +screen_id: str
+        +screen_name: str
+        +capacity: int
+    }
+    
+    class Show {
+        -_show_id: str
+        -_show_time: datetime
+        -_status: ShowStatus
+        +show_id: str
+        +show_time: datetime
+        +status: ShowStatus
+    }
+    
+    class ShowManager {
+        -_buffer_time: timedelta
+        +can_schedule_show(new_show: Show, theatre: Theatre): Dict
+        +validate_show_transition(show: Show, new_status: ShowStatus): bool
+        +start_show(show: Show): bool
+        +cancel_show(show: Show): bool
+        +complete_show(show: Show): bool
+    }
+    
+    TheatreManager *-- ShowManager : uses
+    TheatreManager *-- Theatre : manages
+    Theatre *-- TheatreStatus : has
+    Theatre *-- Screen : contains
+    Theatre *-- Show : contains
+```
+
+## Description
+This diagram shows the TheatreManager's responsibilities for managing theatres, screens, and high-level show operations. It delegates show-specific logic to ShowManager while maintaining control over theatre-level operations. The TheatreManager acts as the main orchestrator for theatre management. 

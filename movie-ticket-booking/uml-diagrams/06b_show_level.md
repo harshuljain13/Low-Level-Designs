@@ -1,0 +1,76 @@
+# Show Level UML Diagram
+
+## Show Management
+
+```mermaid
+classDiagram
+    direction LR
+    
+    class Show {
+        -_show_id: str
+        -_movie: Movie
+        -_screen: Screen
+        -_show_time: datetime
+        -_show_duration: int
+        -_pricing_strategy: PricingStrategy
+        -_status: ShowStatus
+        +show_id: str
+        +movie: Movie
+        +screen: Screen
+        +show_time: datetime
+        +show_duration: int
+        +pricing_strategy: PricingStrategy
+        +status: ShowStatus
+        +seat_layout: SeatLayout
+        +get_show_end_time(): datetime
+        +calculate_seat_price(seat_row_num: int, seat_col_num: int): float
+    }
+    
+    class Movie {
+        -_movie_id: str
+        -_movie_name: str
+        -_movie_duration: int
+        +movie_id: str
+        +movie_name: str
+        +movie_duration: int
+    }
+    
+    class Screen {
+        -_screen_id: str
+        -_screen_name: str
+        -_capacity: int
+        +screen_id: str
+        +screen_name: str
+        +capacity: int
+    }
+    
+    class PricingStrategy {
+        <<abstract>>
+        +calculate_price(base_price: float): float
+    }
+    
+    class ShowStatus {
+        <<enumeration>>
+        SCHEDULED
+        RUNNING
+        COMPLETED
+        CANCELLED
+    }
+    
+    class SeatLayout {
+        -_num_rows: int
+        -_seats_per_row: List[int]
+        +num_rows: int
+        +seats_per_row: List[int]
+        +get_seat(row: int, col: int): Seat
+    }
+    
+    Show *-- Movie : has
+    Show *-- Screen : uses
+    Show *-- PricingStrategy : uses
+    Show *-- ShowStatus : has
+    Show *-- SeatLayout : has
+```
+
+## Description
+This diagram shows the Show-level view focusing on show management. Each Show has a Movie, Screen, PricingStrategy, and SeatLayout. The ShowStatus enum defines the possible states of a show. Simplified to show only essential show-level relationships and operations. 
