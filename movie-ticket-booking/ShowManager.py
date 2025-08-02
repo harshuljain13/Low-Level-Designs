@@ -1,173 +1,157 @@
+"""
+This module contains the ShowManager class, which handles show scheduling
+and validation logic.
+
+Design Pattern: MANAGER PATTERN (Service Layer)
+OOP Principles:
+- Single Responsibility: Manages show scheduling and validation only
+- Encapsulation: Encapsulates show scheduling logic
+- Composition: Works with Show objects
+"""
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 from Show import Show, ShowStatus
-from Seat import Seat, SeatStatus
+from Theatre import Theatre
 
 
 class ShowManager:
     """
-    ShowManager class - Handles show-specific business logic.
+    ShowManager class - Handles show scheduling and validation logic.
 
     Design Pattern: MANAGER PATTERN (Service Layer)
     OOP Principles:
-    - Single Responsibility: Manages show operations only
-    - Encapsulation: Encapsulates show management logic
-    - Composition: Works with Show's seat layout
+    - Single Responsibility: Manages show scheduling and validation only
+    - Encapsulation: Encapsulates show scheduling logic
+    - Composition: Works with Show objects
     """
 
     def __init__(self):
-        self._blocked_seats: Dict[str, Dict[str, datetime]] = (
-            {}
-        )  # show_id -> {seat_id: block_time}
-        self._block_timeout = timedelta(
-            minutes=15
-        )  # 15 minutes timeout for blocked seats
-
-    # Seat Availability Management
-    def get_available_seats(self, show: Show) -> List[str]:
-        """Get list of available seat IDs for a show."""
-        if show.status != ShowStatus.SCHEDULED:
-            return []
-
-        available_seats = []
-        for row in range(show.seat_layout.num_rows):
-            for col in range(show.seat_layout.seats_per_row[row]):
-                seat = show.seat_layout.get_seat(row, col)
-                if seat and seat.status == SeatStatus.AVAILABLE:
-                    # Check if seat is not blocked
-                    if not self._is_seat_blocked(show.show_id, seat.seat_id):
-                        available_seats.append(seat.seat_id)
-
-        return available_seats
-
-    def is_seat_available(self, show: Show, seat_id: str) -> bool:
-        """Check if a specific seat is available for booking."""
-        if show.status != ShowStatus.SCHEDULED:
-            return False
-
-        # Find the seat in the layout
-        seat = self._find_seat_in_layout(show, seat_id)
-        if not seat:
-            return False
-
-        # Check if seat is available and not blocked
-        return seat.status == SeatStatus.AVAILABLE and not self._is_seat_blocked(
-            show.show_id, seat_id
-        )
-
-    def get_seat_price(self, show: Show, seat_id: str) -> Optional[float]:
-        """Get the price for a specific seat in a show using pricing strategy."""
-        return show.calculate_seat_price(seat_id)
-
-    # Seat Booking Management
-    def book_seat(self, show: Show, seat_id: str) -> bool:
-        """Book a seat for a show."""
-        if not self.is_seat_available(show, seat_id):
-            return False
-
-        seat = self._find_seat_in_layout(show, seat_id)
-        if seat:
-            seat.book_seat()
-            self._unblock_seat(show.show_id, seat_id)
-            return True
-
-        return False
-
-    def cancel_seat_booking(self, show: Show, seat_id: str) -> bool:
-        """Cancel a seat booking."""
-        seat = self._find_seat_in_layout(show, seat_id)
-        if seat and seat.status == SeatStatus.BOOKED:
-            seat.release_seat()
-            return True
-        return False
-
-    def book_multiple_seats(self, show: Show, seat_ids: List[str]) -> Dict[str, bool]:
-        """Book multiple seats and return results for each seat."""
-        results = {}
-
-        for seat_id in seat_ids:
-            results[seat_id] = self.book_seat(show, seat_id)
-
-        return results
-
-    # Seat Blocking Management (for booking process)
-    def block_seat(self, show: Show, seat_id: str) -> bool:
-        """Block a seat temporarily for booking process."""
-        if not self.is_seat_available(show, seat_id):
-            return False
-
-        if show.show_id not in self._blocked_seats:
-            self._blocked_seats[show.show_id] = {}
-
-        self._blocked_seats[show.show_id][seat_id] = datetime.now()
-        return True
-
-    def unblock_seat(self, show: Show, seat_id: str) -> bool:
-        """Unblock a seat."""
-        return self._unblock_seat(show.show_id, seat_id)
-
-    def block_multiple_seats(self, show: Show, seat_ids: List[str]) -> Dict[str, bool]:
-        """Block multiple seats and return results for each seat."""
-        results = {}
-
-        for seat_id in seat_ids:
-            results[seat_id] = self.block_seat(show, seat_id)
-
-        return results
-
-    def get_blocked_seats(self, show: Show) -> List[str]:
-        """Get list of currently blocked seats for a show."""
-        return self._get_blocked_seats_for_show(show.show_id)
-
-    # Show Statistics
-    def get_show_statistics(self, show: Show) -> Dict[str, any]:
-        """Get statistics for a specific show."""
-        total_seats = 0
-        booked_seats = 0
-        available_seats = 0
-
-        for row in range(show.seat_layout.num_rows):
-            for col in range(show.seat_layout.seats_per_row[row]):
-                seat = show.seat_layout.get_seat(row, col)
-                if seat:
-                    total_seats += 1
-                    if seat.status == SeatStatus.BOOKED:
-                        booked_seats += 1
-                    elif seat.status == SeatStatus.AVAILABLE:
-                        available_seats += 1
-
-        blocked_seats = len(self._get_blocked_seats_for_show(show.show_id))
-
+        self._buffer_time = timedelta(minutes=30)  # Buffer between shows
+    
+    # Show Scheduling and Validation
+    def can_schedule_show(self, new_show: Show, theatre: Theatre) -> Dict[str, any]:
+        """
+        Check if a show can be scheduled in a theatre.
+        
+        Returns:
+            Dict with 'can_schedule' (bool) and 'conflicts' (list of conflict details)
+        """
+        conflicts = []
+        
+        # Check if screen exists in theatre
+        if not theatre.get_screen_by_id(new_show.screen.screen_id):
+            conflicts.append(f"Screen {new_show.screen.screen_id} not found in theatre")
+        
+        # Check for time conflicts with existing shows
+        time_conflicts = self._check_time_conflicts(new_show, theatre.shows)
+        conflicts.extend(time_conflicts)
+        
+        # Check if show time is in the future
+        if new_show.show_time <= datetime.now():
+            conflicts.append("Show time must be in the future")
+        
+        # Check if show duration is reasonable
+        if new_show.show_duration <= 0 or new_show.show_duration > 300:  # 5 hours max
+            conflicts.append("Show duration must be between 1 and 300 minutes")
+        
         return {
-            "show_id": show.show_id,
-            "total_seats": total_seats,
-            "booked_seats": booked_seats,
-            "blocked_seats": blocked_seats,
-            "available_seats": available_seats,
-            "occupancy_percentage": (
-                (booked_seats / total_seats * 100) if total_seats > 0 else 0
-            ),
-            "status": show.status.value,
+            "can_schedule": len(conflicts) == 0,
+            "conflicts": conflicts
         }
 
-    def get_show_revenue(self, show: Show) -> float:
-        """Calculate total revenue for a show using pricing strategy."""
-        total_revenue = 0.0
+    def find_available_slots(self, theatre: Theatre, screen_id: str, 
+                           date: datetime, duration: int) -> List[Dict[str, datetime]]:
+        """
+        Find available time slots for a show on a specific screen and date.
+        
+        Returns:
+            List of available slots with start and end times
+        """
+        available_slots = []
+        
+        # Get all shows for the screen on the given date
+        screen_shows = [
+            show for show in theatre.shows 
+            if show.screen.screen_id == screen_id and 
+            show.show_time.date() == date.date()
+        ]
+        
+        # Sort shows by start time
+        screen_shows.sort(key=lambda x: x.show_time)
+        
+        # Define business hours (e.g., 9 AM to 11 PM)
+        business_start = date.replace(hour=9, minute=0, second=0, microsecond=0)
+        business_end = date.replace(hour=23, minute=0, second=0, microsecond=0)
+        
+        current_time = business_start
+        
+        for show in screen_shows:
+            # Check if there's enough time before this show
+            if current_time + timedelta(minutes=duration) + self._buffer_time <= show.show_time:
+                available_slots.append({
+                    "start_time": current_time,
+                    "end_time": current_time + timedelta(minutes=duration)
+                })
+            
+            # Move current time to after this show ends
+            current_time = show.get_show_end_time() + self._buffer_time
+        
+        # Check if there's time after the last show
+        if current_time + timedelta(minutes=duration) <= business_end:
+            available_slots.append({
+                "start_time": current_time,
+                "end_time": current_time + timedelta(minutes=duration)
+            })
+        
+        return available_slots
 
-        for row in range(show.seat_layout.num_rows):
-            for col in range(show.seat_layout.seats_per_row[row]):
-                seat = show.seat_layout.get_seat(row, col)
-                if seat and seat.status == SeatStatus.BOOKED:
-                    total_revenue += show.calculate_seat_price(seat.seat_id)
+    def get_show_schedule(self, theatre: Theatre, screen_id: Optional[str] = None, 
+                         date: Optional[datetime] = None) -> List[Show]:
+        """
+        Get show schedule for a theatre, optionally filtered by screen and date.
+        
+        Returns:
+            List of shows sorted by start time
+        """
+        shows = theatre.shows
+        
+        # Filter by screen if specified
+        if screen_id:
+            shows = [show for show in shows if show.screen.screen_id == screen_id]
+        
+        # Filter by date if specified
+        if date:
+            shows = [
+                show for show in shows 
+                if show.show_time.date() == date.date()
+            ]
+        
+        # Sort by start time
+        shows.sort(key=lambda x: x.show_time)
+        return shows
 
-        return total_revenue
+    def validate_show_transition(self, show: Show, new_status: ShowStatus) -> bool:
+        """
+        Validate if a show can transition to a new status.
+        
+        Returns:
+            True if transition is valid, False otherwise
+        """
+        valid_transitions = {
+            ShowStatus.SCHEDULED: [ShowStatus.RUNNING, ShowStatus.CANCELLED],
+            ShowStatus.RUNNING: [ShowStatus.COMPLETED, ShowStatus.CANCELLED],
+            ShowStatus.COMPLETED: [],  # Terminal state
+            ShowStatus.CANCELLED: []   # Terminal state
+        }
+        
+        current_status = show.status
+        return new_status in valid_transitions.get(current_status, [])
 
     # Show Status Management
     def can_start_show(self, show: Show) -> bool:
         """Check if a show can be started."""
         if show.status != ShowStatus.SCHEDULED:
             return False
-
         current_time = datetime.now()
         return current_time >= show.show_time
 
@@ -175,8 +159,37 @@ class ShowManager:
         """Check if a show can be cancelled."""
         return show.status not in [ShowStatus.COMPLETED, ShowStatus.CANCELLED]
 
-    def has_time_conflict(self, new_show: Show, existing_shows: List[Show]) -> bool:
-        """Check if a new show has time conflicts with existing shows on the same screen."""
+    def can_complete_show(self, show: Show) -> bool:
+        """Check if a show can be completed."""
+        return show.status == ShowStatus.RUNNING
+
+    def start_show(self, show: Show) -> bool:
+        """Start a show if conditions are met."""
+        if not self.can_start_show(show):
+            return False
+        show.status = ShowStatus.RUNNING
+        return True
+
+    def cancel_show(self, show: Show) -> bool:
+        """Cancel a show if conditions are met."""
+        if not self.can_cancel_show(show):
+            print(f"Cannot cancel show {show.show_id} because it is not in the scheduled state")
+            return False
+        print(f"Cancelling show {show.show_id}")
+        show.status = ShowStatus.CANCELLED
+        return True
+
+    def complete_show(self, show: Show) -> bool:
+        """Complete a show if conditions are met."""
+        if not self.can_complete_show(show):
+            return False
+        show.status = ShowStatus.COMPLETED
+        return True
+
+    # Private helper methods
+    def _check_time_conflicts(self, new_show: Show, existing_shows: List[Show]) -> List[str]:
+        """Check for time conflicts with existing shows on the same screen."""
+        conflicts = []
         new_start = new_show.show_time
         new_end = new_show.get_show_end_time()
 
@@ -185,91 +198,62 @@ class ShowManager:
                 existing_start = existing_show.show_time
                 existing_end = existing_show.get_show_end_time()
 
-                # 30 minutes buffer between shows
-                buffer = timedelta(minutes=30)
+                # Check for overlap with buffer time
                 if (
-                    new_start < existing_end + buffer
-                    and new_end > existing_start - buffer
+                    new_start < existing_end + self._buffer_time
+                    and new_end > existing_start - self._buffer_time
                 ):
-                    return True
+                    conflicts.append(
+                        f"Time conflict with show {existing_show.show_id} "
+                        f"({existing_start} - {existing_end})"
+                    )
 
-        return False
+        return conflicts
 
-    # Cleanup expired blocks
-    def cleanup_expired_blocks(self) -> int:
-        """Clean up expired seat blocks and return number of cleaned blocks."""
-        cleaned_count = 0
-        current_time = datetime.now()
 
-        for show_id in list(self._blocked_seats.keys()):
-            expired_seats = []
-
-            for seat_id, block_time in self._blocked_seats[show_id].items():
-                if current_time - block_time > self._block_timeout:
-                    expired_seats.append(seat_id)
-
-            for seat_id in expired_seats:
-                del self._blocked_seats[show_id][seat_id]
-                cleaned_count += 1
-
-            # Remove empty show entries
-            if not self._blocked_seats[show_id]:
-                del self._blocked_seats[show_id]
-
-        return cleaned_count
-
-    # Private helper methods
-    def _find_seat_in_layout(self, show: Show, seat_id: str) -> Optional[Seat]:
-        """Find a seat in the show's seat layout by seat ID."""
-        for row in range(show.seat_layout.num_rows):
-            for col in range(show.seat_layout.seats_per_row[row]):
-                seat = show.seat_layout.get_seat(row, col)
-                if seat and seat.seat_id == seat_id:
-                    return seat
-        return None
-
-    def _is_seat_blocked(self, show_id: str, seat_id: str) -> bool:
-        """Check if a seat is currently blocked."""
-        if show_id not in self._blocked_seats:
-            return False
-
-        if seat_id not in self._blocked_seats[show_id]:
-            return False
-
-        # Check if block has expired
-        block_time = self._blocked_seats[show_id][seat_id]
-        if datetime.now() - block_time > self._block_timeout:
-            # Remove expired block
-            del self._blocked_seats[show_id][seat_id]
-            return False
-
-        return True
-
-    def _get_blocked_seats_for_show(self, show_id: str) -> List[str]:
-        """Get list of blocked seats for a show (excluding expired ones)."""
-        if show_id not in self._blocked_seats:
-            return []
-
-        current_time = datetime.now()
-        valid_blocked_seats = []
-
-        for seat_id, block_time in self._blocked_seats[show_id].items():
-            if current_time - block_time <= self._block_timeout:
-                valid_blocked_seats.append(seat_id)
-            else:
-                # Remove expired block
-                del self._blocked_seats[show_id][seat_id]
-
-        return valid_blocked_seats
-
-    def _unblock_seat(self, show_id: str, seat_id: str) -> bool:
-        """Unblock a seat."""
-        if show_id in self._blocked_seats and seat_id in self._blocked_seats[show_id]:
-            del self._blocked_seats[show_id][seat_id]
-
-            # Remove empty show entries
-            if not self._blocked_seats[show_id]:
-                del self._blocked_seats[show_id]
-
-            return True
-        return False
+if __name__ == "__main__":
+    # Example usage
+    from Theatre import Theatre
+    from Movie import Movie, MovieLanguage, MovieGenre
+    from Screen import IMAXScreen
+    from Show import Show
+    from SeatPricingStrategy import PricingStrategyFactory
+    
+    # Create a theatre
+    theatre = Theatre("T001", "Test Theatre", "Test City", "Test Address", "123-456-7890", "test@theatre.com")
+    
+    # Create a screen
+    screen = IMAXScreen("S001", "IMAX Screen 1", 100, 2, [10, 10])
+    theatre.add_screen(screen)
+    
+    # Create a movie
+    movie = Movie(
+        "M001", "Test Movie", 120, MovieLanguage.ENGLISH, 
+        MovieGenre.ACTION, 8.5, "2024-01-01", "Test Director", 
+        "Test Cast", "test-trailer.com"
+    )
+    
+    # Create a show
+    show_time = datetime.now().replace(hour=14, minute=30, second=0, microsecond=0)
+    test_show = Show(
+        "SH001", movie, screen, show_time, 120,
+        PricingStrategyFactory.create_default_strategy()
+    )
+    
+    # Test show manager
+    show_manager = ShowManager()
+    
+    # Test scheduling validation
+    result = show_manager.can_schedule_show(test_show, theatre)
+    print(f"Can schedule show: {result['can_schedule']}")
+    if result['conflicts']:
+        print(f"Conflicts: {result['conflicts']}")
+    
+    # Test available slots
+    date = datetime.now().date()
+    slots = show_manager.find_available_slots(theatre, "S001", datetime.now(), 120)
+    print(f"Available slots: {len(slots)}")
+    
+    # Test show schedule
+    schedule = show_manager.get_show_schedule(theatre)
+    print(f"Show schedule: {len(schedule)} shows")

@@ -121,6 +121,13 @@ class Theatre:
                 return screen
         return None
 
+    def get_shows_by_screen_id(self, screen_id: str) -> List[Show]:
+        """Get all shows that reference a specific screen ID."""
+        return [
+            show for show in self._shows 
+            if show.screen.screen_id == screen_id
+        ]
+
     def get_show_by_id(self, show_id: str) -> Show:
         """Get a show by ID."""
         for show in self._shows:

@@ -1,19 +1,17 @@
+'''
+This module contains the Screen class, which represents a screen.
+'''
 from abc import ABC, abstractmethod
 from typing import List
-from Seat import Seat, PremiumSeat, RegularSeat, ReclinerSeat
 from enum import Enum
+from Seat import Seat, PremiumSeat, RegularSeat, ReclinerSeat
 from SeatLayout import SeatLayout
 
 
 class ScreenType(Enum):
-    """
-    Enum for screen types.
-
-    OOP Principle: Encapsulation
-    - Encapsulates screen type constants in a type-safe way
-    - Prevents invalid screen type values
-    """
-
+    '''
+    This enum represents the type of a screen.
+    '''
     IMAX = "IMAX"
     THREE_D = "3D"
     REGULAR = "Regular"
@@ -55,30 +53,51 @@ class Screen(ABC):
 
     @property
     def screen_id(self) -> str:
+        '''
+        This method returns the ID of the screen.
+        '''
         return self._screen_id
 
     @property
     def screen_name(self) -> str:
+        '''
+        This method returns the name of the screen.
+        '''
         return self._screen_name
 
     @property
     def screen_type(self) -> ScreenType:
+        '''
+        This method returns the type of the screen.
+        '''
         return self._screen_type
 
     @property
     def screen_capacity(self) -> int:
+        '''
+        This method returns the capacity of the screen.
+        '''
         return self._screen_capacity
 
     @property
     def seat_layout(self) -> SeatLayout:
+        '''
+        This method returns the seat layout of the screen.
+        '''
         return self._seat_layout
 
     @property
     def seats(self) -> List[Seat]:
+        '''
+        This method returns the seats of the screen.
+        '''
         return self._seat_layout._seats
 
     @abstractmethod
     def prepare_seat_layout(self) -> None:
+        '''
+        This method prepares the seat layout of the screen.
+        '''
         pass
 
 
@@ -117,13 +136,15 @@ class IMAXScreen(Screen):
         for row in range(self._num_rows // 2):
             for col in range(self._seats_per_row[row]):
                 self._seat_layout.add_seat(
-                    PremiumSeat(f"R{row}C{col}", f"R{row}C{col}", 200), row, col
+                    PremiumSeat(f"R{row}C{col}", f"R{row}C{col}", 200),
+                    row, col
                 )
 
         for row in range(self._num_rows // 2, self._num_rows):
             for col in range(self._seats_per_row[row]):
                 self._seat_layout.add_seat(
-                    RegularSeat(f"R{row}C{col}", f"R{row}C{col}", 100), row, col
+                    RegularSeat(f"R{row}C{col}", f"R{row}C{col}", 100),
+                    row, col
                 )
 
 
@@ -160,13 +181,15 @@ class ThreeD(Screen):
         for row in range(self._num_rows // 2):
             for col in range(self._seats_per_row[row]):
                 self._seat_layout.add_seat(
-                    PremiumSeat(f"R{row}C{col}", f"R{row}C{col}", 200), row, col
+                    PremiumSeat(f"R{row}C{col}", f"R{row}C{col}", 200),
+                    row, col
                 )
 
         for row in range(self._num_rows // 2, self._num_rows):
             for col in range(self._seats_per_row[row]):
                 self._seat_layout.add_seat(
-                    ReclinerSeat(f"R{row}C{col}", f"R{row}C{col}", 100), row, col
+                    ReclinerSeat(f"R{row}C{col}", f"R{row}C{col}", 100),
+                    row, col
                 )
 
 
