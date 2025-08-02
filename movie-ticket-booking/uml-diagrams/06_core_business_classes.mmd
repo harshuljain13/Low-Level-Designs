@@ -1,0 +1,89 @@
+classDiagram
+    class Theatre {
+        -_theatre_id: str
+        -_theatre_name: str
+        -_theatre_location: str
+        -_theatre_address: str
+        -_theatre_contact: str
+        -_theatre_email: str
+        -_status: TheatreStatus
+        -_screens: List[Screen]
+        -_shows: List[Show]
+        +theatre_id: str
+        +theatre_name: str
+        +theatre_location: str
+        +theatre_address: str
+        +theatre_contact: str
+        +theatre_email: str
+        +status: TheatreStatus
+        +screens: List[Screen]
+        +shows: List[Show]
+        +total_screens: int
+        +total_shows: int
+        +set_status(status: TheatreStatus): void
+        +add_screen(screen: Screen): void
+        +remove_screen(screen: Screen): void
+        +get_screen_by_id(screen_id: str): Screen
+        +get_show_by_id(show_id: str): Show
+        +get_shows_by_screen_id(screen_id: str): List[Show]
+        +add_show(show: Show): void
+        +remove_show(show: Show): void
+    }
+    
+    class Show {
+        -_show_id: str
+        -_movie: Movie
+        -_screen: Screen
+        -_show_time: datetime
+        -_show_duration: int
+        -_pricing_strategy: PricingStrategy
+        -_status: ShowStatus
+        +show_id: str
+        +movie: Movie
+        +screen: Screen
+        +show_time: datetime
+        +show_duration: int
+        +pricing_strategy: PricingStrategy
+        +status: ShowStatus
+        +seat_layout: SeatLayout
+        +get_show_end_time(): datetime
+        +calculate_seat_price(seat_row_num: int, seat_col_num: int): float
+        +_find_seat_by_row_col(seat_row_num: int, seat_col_num: int): Seat
+    }
+    
+    class SeatLayout {
+        -_num_rows: int
+        -_seats_per_row: List[int]
+        -_seats: List[List[Seat]]
+        +num_rows: int
+        +seats_per_row: List[int]
+        +get_seat(row: int, col: int): Seat
+        +get_seat_by_id(seat_id: str): Seat
+        +get_all_seats(): List[Seat]
+    }
+    
+    class TheatreStatus {
+        <<enumeration>>
+        ACTIVE
+        INACTIVE
+        MAINTENANCE
+        CLOSED
+    }
+    
+    class ShowStatus {
+        <<enumeration>>
+        SCHEDULED
+        RUNNING
+        COMPLETED
+        CANCELLED
+    }
+    
+    Theatre *-- Show : contains
+    Theatre *-- Screen : contains
+    Show *-- Movie : has
+    Show *-- Screen : uses
+    Show *-- PricingStrategy : uses
+    Screen *-- SeatLayout : has
+    SeatLayout *-- Seat : contains
+    Theatre *-- TheatreStatus : has
+    Show *-- ShowStatus : has 

@@ -1,0 +1,78 @@
+# Manager Classes UML Diagram
+
+## Step 7: Service Layer Manager Classes
+
+```mermaid
+classDiagram
+    class TheatreManager {
+        -_theatres: Dict[str, Theatre]
+        -_show_manager: ShowManager
+        +add_theatre(theatre: Theatre): bool
+        +get_theatre(theatre_id: str): Theatre
+        +get_all_theatres(): List[Theatre]
+        +get_theatres_by_location(location: str): List[Theatre]
+        +get_active_theatres(): List[Theatre]
+        +set_theatre_status(theatre_id: str, status: TheatreStatus): bool
+        +add_screen(theatre_id: str, screen: Screen): bool
+        +get_screen(theatre_id: str, screen_id: str): Screen
+        +remove_screen(theatre_id: str, screen_id: str): bool
+        +add_show(theatre_id: str, show: Show): bool
+        +get_show(theatre_id: str, show_id: str): Show
+        +get_shows_by_theatre(theatre_id: str): List[Show]
+        +get_available_shows(theatre_id: str): List[Show]
+        +start_show(theatre_id: str, show_id: str): bool
+        +cancel_show(theatre_id: str, show_id: str): bool
+        +complete_show(theatre_id: str, show_id: str): bool
+        +remove_show(theatre_id: str, show_id: str): bool
+        +cancel_and_remove_show(theatre_id: str, show_id: str): bool
+        +find_available_slots(theatre_id: str, screen_id: str, date: datetime, duration: int): List[Dict]
+        +get_show_schedule(theatre_id: str, screen_id: str, date: datetime): List[Show]
+        +validate_screen_show_relationships(theatre_id: str): Dict
+        +cleanup_orphaned_shows(theatre_id: str): int
+    }
+    
+    class ShowManager {
+        -_buffer_time: timedelta
+        +can_schedule_show(new_show: Show, theatre: Theatre): Dict
+        +find_available_slots(theatre: Theatre, screen_id: str, date: datetime, duration: int): List[Dict]
+        +get_show_schedule(theatre: Theatre, screen_id: str, date: datetime): List[Show]
+        +validate_show_transition(show: Show, new_status: ShowStatus): bool
+        +can_start_show(show: Show): bool
+        +can_cancel_show(show: Show): bool
+        +can_complete_show(show: Show): bool
+        +start_show(show: Show): bool
+        +cancel_show(show: Show): bool
+        +complete_show(show: Show): bool
+        +_check_time_conflicts(new_show: Show, existing_shows: List[Show]): List[str]
+    }
+    
+    class BookingManager {
+        -_blocked_seats: Dict[str, Dict[str, datetime]]
+        -_block_timeout: timedelta
+        +get_available_seats(show: Show): List[str]
+        +is_seat_available(show: Show, seat_id: str): bool
+        +get_seat_price(show: Show, seat_id: str): float
+        +book_seat(show: Show, seat_id: str): bool
+        +cancel_seat_booking(show: Show, seat_id: str): bool
+        +book_multiple_seats(show: Show, seat_ids: List[str]): Dict[str, bool]
+        +block_seat(show: Show, seat_id: str): bool
+        +unblock_seat(show: Show, seat_id: str): bool
+        +block_multiple_seats(show: Show, seat_ids: List[str]): Dict[str, bool]
+        +get_blocked_seats(show: Show): List[str]
+        +get_show_statistics(show: Show): Dict
+        +get_show_revenue(show: Show): float
+        +cleanup_expired_blocks(): int
+        +_find_seat_in_layout(show: Show, seat_id: str): Seat
+        +_is_seat_blocked(show_id: str, seat_id: str): bool
+        +_get_blocked_seats_for_show(show_id: str): List[str]
+        +_unblock_seat(show_id: str, seat_id: str): bool
+    }
+    
+    TheatreManager *-- ShowManager : uses
+    TheatreManager *-- Theatre : manages
+    BookingManager ..> Show : works with
+    BookingManager ..> Seat : manages
+```
+
+## Description
+This diagram shows the service layer manager classes. TheatreManager manages theatres and uses ShowManager for show-specific logic. BookingManager handles seat booking operations and works with Shows and Seats. This demonstrates the separation of concerns and composition pattern. 

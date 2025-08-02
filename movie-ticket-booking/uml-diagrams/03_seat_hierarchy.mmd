@@ -1,0 +1,59 @@
+classDiagram
+    class Seat {
+        <<abstract>>
+        -_seat_id: str
+        -_seat_number: str
+        -_base_price: float
+        -_status: SeatStatus
+        -_created_at: datetime
+        -_updated_at: datetime
+        +seat_id: str
+        +seat_number: str
+        +base_price: float
+        +status: SeatStatus
+        +is_available(): bool
+        +is_booked(): bool
+        +is_blocked(): bool
+        +book_seat(): void
+        +release_seat(): void
+        +get_seat_type()*: SeatType
+        +calculate_price(pricing_strategy: PricingStrategy): float
+    }
+    
+    class RegularSeat {
+        +get_seat_type(): SeatType
+    }
+    
+    class PremiumSeat {
+        +get_seat_type(): SeatType
+    }
+    
+    class ReclinerSeat {
+        +get_seat_type(): SeatType
+    }
+    
+    class SeatFactory {
+        +create_seat(seat_type: SeatType, seat_id: str, seat_number: str, base_price: float): Seat
+        +create_seat_row(seat_type: SeatType, row_number: int, seats_count: int, base_price: float): List[Seat]
+    }
+    
+    class SeatStatus {
+        <<enumeration>>
+        AVAILABLE
+        BOOKED
+        BLOCKED
+    }
+    
+    class SeatType {
+        <<enumeration>>
+        REGULAR
+        PREMIUM
+        RECLINER
+    }
+    
+    Seat <|-- RegularSeat
+    Seat <|-- PremiumSeat
+    Seat <|-- ReclinerSeat
+    Seat *-- SeatStatus : has
+    Seat *-- SeatType : has
+    SeatFactory ..> Seat : creates 

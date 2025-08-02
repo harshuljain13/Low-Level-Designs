@@ -1,0 +1,232 @@
+classDiagram
+    %% Core Classes
+    class Movie {
+        +movie_id: str
+        +movie_name: str
+        +movie_duration: int
+        +movie_language: MovieLanguage
+        +movie_genre: MovieGenre
+    }
+    
+    class Screen {
+        <<abstract>>
+        +screen_id: str
+        +screen_name: str
+        +screen_type: ScreenType
+        +prepare_seat_layout()*: void
+    }
+    
+    class IMAXScreen {
+        +prepare_seat_layout(): void
+    }
+    
+    class ThreeD {
+        +prepare_seat_layout(): void
+    }
+    
+    class Seat {
+        <<abstract>>
+        +seat_id: str
+        +seat_number: str
+        +base_price: float
+        +status: SeatStatus
+        +calculate_price(pricing_strategy: PricingStrategy): float
+    }
+    
+    class RegularSeat {
+        +get_seat_type(): SeatType
+    }
+    
+    class PremiumSeat {
+        +get_seat_type(): SeatType
+    }
+    
+    class ReclinerSeat {
+        +get_seat_type(): SeatType
+    }
+    
+    class PricingStrategy {
+        <<abstract>>
+        +calculate_price(base_price: float)*: float
+    }
+    
+    class DefaultPricingStrategy {
+        +calculate_price(base_price: float): float
+    }
+    
+    class HolidayPricingStrategy {
+        +calculate_price(base_price: float): float
+    }
+    
+    class User {
+        <<abstract>>
+        +user_id: str
+        +name: str
+        +email: str
+        +get_role()*: UserRole
+    }
+    
+    class Customer {
+        +get_role(): UserRole
+    }
+    
+    class Admin {
+        +get_role(): UserRole
+    }
+    
+    class TheaterManager {
+        +get_role(): UserRole
+    }
+    
+    class Theatre {
+        +theatre_id: str
+        +theatre_name: str
+        +screens: List[Screen]
+        +shows: List[Show]
+        +add_screen(screen: Screen): void
+        +add_show(show: Show): void
+    }
+    
+    class Show {
+        +show_id: str
+        +movie: Movie
+        +screen: Screen
+        +pricing_strategy: PricingStrategy
+        +status: ShowStatus
+        +calculate_seat_price(seat_row_num: int, seat_col_num: int): float
+    }
+    
+    class SeatLayout {
+        +num_rows: int
+        +seats_per_row: List[int]
+        +get_seat(row: int, col: int): Seat
+    }
+    
+    class TheatreManager {
+        +add_theatre(theatre: Theatre): bool
+        +add_show(theatre_id: str, show: Show): bool
+        +start_show(theatre_id: str, show_id: str): bool
+    }
+    
+    class ShowManager {
+        +can_schedule_show(new_show: Show, theatre: Theatre): Dict
+        +start_show(show: Show): bool
+        +cancel_show(show: Show): bool
+    }
+    
+    class BookingManager {
+        +get_available_seats(show: Show): List[str]
+        +book_seat(show: Show, seat_id: str): bool
+        +get_show_statistics(show: Show): Dict
+    }
+    
+    %% Enums
+    class MovieLanguage {
+        <<enumeration>>
+        ENGLISH
+        HINDI
+        MARATHI
+        TAMIL
+        TELUGU
+    }
+    
+    class MovieGenre {
+        <<enumeration>>
+        ACTION
+        COMEDY
+        DRAMA
+        HORROR
+        ROMANCE
+        SCI_FI
+    }
+    
+    class ScreenType {
+        <<enumeration>>
+        IMAX
+        THREE_D
+        REGULAR
+    }
+    
+    class SeatStatus {
+        <<enumeration>>
+        AVAILABLE
+        BOOKED
+        BLOCKED
+    }
+    
+    class SeatType {
+        <<enumeration>>
+        REGULAR
+        PREMIUM
+        RECLINER
+    }
+    
+    class UserRole {
+        <<enumeration>>
+        CUSTOMER
+        ADMIN
+        THEATER_MANAGER
+    }
+    
+    class UserStatus {
+        <<enumeration>>
+        ACTIVE
+        INACTIVE
+        SUSPENDED
+    }
+    
+    class TheatreStatus {
+        <<enumeration>>
+        ACTIVE
+        INACTIVE
+        MAINTENANCE
+        CLOSED
+    }
+    
+    class ShowStatus {
+        <<enumeration>>
+        SCHEDULED
+        RUNNING
+        COMPLETED
+        CANCELLED
+    }
+    
+    %% Relationships
+    %% Inheritance
+    Screen <|-- IMAXScreen
+    Screen <|-- ThreeD
+    Seat <|-- RegularSeat
+    Seat <|-- PremiumSeat
+    Seat <|-- ReclinerSeat
+    User <|-- Customer
+    User <|-- Admin
+    User <|-- TheaterManager
+    PricingStrategy <|-- DefaultPricingStrategy
+    PricingStrategy <|-- HolidayPricingStrategy
+    
+    %% Composition/Aggregation
+    Theatre *-- Screen : contains
+    Theatre *-- Show : contains
+    Show *-- Movie : has
+    Show *-- Screen : uses
+    Show *-- PricingStrategy : uses
+    Screen *-- SeatLayout : has
+    SeatLayout *-- Seat : contains
+    TheatreManager *-- ShowManager : uses
+    TheatreManager *-- Theatre : manages
+    BookingManager ..> Show : works with
+    BookingManager ..> Seat : manages
+    
+    %% Strategy Pattern
+    Seat ..> PricingStrategy : uses strategy
+    
+    %% Enums
+    Movie *-- MovieLanguage : has
+    Movie *-- MovieGenre : has
+    Screen *-- ScreenType : has
+    Seat *-- SeatStatus : has
+    Seat *-- SeatType : has
+    User *-- UserRole : has
+    User *-- UserStatus : has
+    Theatre *-- TheatreStatus : has
+    Show *-- ShowStatus : has 
