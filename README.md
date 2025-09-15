@@ -3,16 +3,17 @@ Low Level Designs for the interviews.
 
 ### Services
 
-- [ ] Movie Ticket Booking
+- [x] Movie Ticket Booking System - Book My show, AMC
 - [ ] Hotel Management
-- [ ] Ecommerce
 - [ ] Library Management 
 - [ ] Inventory Management
 - [ ] Parking Lot Management
 - [ ] Locker Management
 - [ ] Ride share
 - [ ] Stock Exchange
-- [X] Limit Order Booking
+- [x] Limit Order Booking
+- [ ] User Recommendation system
+- [ ] GenAI Semantic search service
 
 ### Games
 
