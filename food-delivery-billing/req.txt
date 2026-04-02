@@ -1,0 +1,77 @@
+# Problem Statement: Food Delivery Billing
+
+Users
+Orders
+Drivers
+
+OrderBill
+OrderDriverPayout
+
+Users (ignore)
+    + create Orders
+    + Pays for Bill
+
+Items
+    - item_id
+    - item_name
+    - item_price
+
+Orders 
+    - number
+    - Items
+    - created_at
+    - updated_at
+    - associated_driver
+    - Status : PROCESSED; IN_PREP; IN_TRANSIT, DELIVERED
+    - OrderBill
+
+    + Delivered by Drivers
+    + Taken by Drivers
+
+Order has a Bill -> OrderBill
+    - itemized_prices
+    - Taxes
+    - Delivery Fee
+    - Service Fee
+    - Surcharge Fee
+    - Discounts
+    - Tips
+    - Final Amount
+
+RuleType(Enum)
+
+Rule
+    - category: RuleType
+
+    + is_applicable
+    + apply -> FeeComponent
+
+BaseDeliveryFeeRule(Rule)
+    - category: FEE
+
+DistanceDeliveryFeeRule(Rule)
+    - category: FEE
+
+PeakHourSurchargeRule(Rule)
+    - category: SURCHARGE
+
+PromoRule(Rule)
+    - category: DISCOUNT
+
+TaxRule(Rule)
+    - category: TAX
+
+
+# Bill needs to be calculated
+OrderBillCalculator -> Facade
+    + generate_order_bill
+        - Fetch the order information
+        - Apply the promos and Discounts
+        - Apply the extra charges
+        - print the Bill
+
+OrderBillPrint
+    + print_bill(strategy)
+        - calls the printing strategy
+
+
